@@ -82,9 +82,11 @@ import { GoogleRouteMapComponent } from '../../shared/google-route-map.component
               <article class="place-card">
                 <span class="place-icon"><lucide-icon [name]="placeIcon(place.kind)" size="22" /></span>
                 <div><strong>{{ place.label }}</strong><span>{{ place.radiusM }} m radius · {{ place.kind }} · {{ coordinateLabel(place) }}</span></div>
-                <button type="button" title="Use for route preview" (click)="choosePlace(place)"><lucide-icon name="navigation" size="17" /></button>
-                <button type="button" title="Edit saved place" (click)="editPlace(place)"><lucide-icon name="pencil" size="17" /></button>
-                <button type="button" class="danger" title="Remove saved place" (click)="removePlace(place)"><lucide-icon name="trash-2" size="17" /></button>
+                <div class="place-card-actions">
+                  <button type="button" title="Use for route preview" (click)="choosePlace(place)"><lucide-icon name="navigation" size="17" /></button>
+                  <button type="button" title="Edit saved place" (click)="editPlace(place)"><lucide-icon name="pencil" size="17" /></button>
+                  <button type="button" class="danger" title="Remove saved place" (click)="removePlace(place)"><lucide-icon name="trash-2" size="17" /></button>
+                </div>
               </article>
             } @empty { <article class="empty-card">No saved places yet. Add Home, Office, or a regular stop above.</article> }
           }
@@ -141,26 +143,7 @@ import { GoogleRouteMapComponent } from '../../shared/google-route-map.component
       <a class="primary-action" href="https://github.com/KVK666/ride-pulse/releases/tag/latest" target="_blank" rel="noreferrer">Record in Android</a>
     </section>
   `,
-  styles: `
-    .plan-section-head { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:24px 0 14px; }
-    .plan-section-head h3 { margin:4px 0 0; font-size:1.2rem; }
-    .places-layout { display:grid; grid-template-columns:minmax(280px,.78fr) minmax(0,1.22fr); gap:18px; margin-bottom:24px; }
-    .place-form,.place-list { border:1px solid var(--border); border-radius:22px; padding:20px; background:var(--surface); }
-    .place-form { display:grid; gap:12px; }
-    .place-form h3 { margin:4px 0; } .place-form p { margin:0; color:var(--muted); line-height:1.5; }
-    .place-form label { display:grid; gap:6px; color:var(--muted); font-size:.78rem; font-weight:900; }
-    .place-form input,.place-form select { min-height:44px; border:1px solid var(--border-strong); border-radius:12px; padding:0 11px; color:var(--text); background:var(--background); font:inherit; }
-    .coordinate-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .location-action { min-height:44px; border:1px solid var(--border-strong); border-radius:12px; display:flex; align-items:center; gap:8px; padding:0 12px; color:var(--text); background:var(--elevated); font:inherit; font-weight:900; cursor:pointer; }
-    .location-action small { margin-left:auto; color:var(--muted); }
-    .place-list .section-head { align-items:flex-end; } .place-list h3 { margin:4px 0 0; }
-    .icon-button,.place-card button { width:40px; min-height:40px; border:0; border-radius:12px; display:grid; place-items:center; color:var(--text); background:var(--elevated); cursor:pointer; }
-    .place-card { min-height:72px; display:flex; align-items:center; gap:9px; padding:10px 0; border-top:1px solid var(--border); }
-    .place-card > div { flex:1; min-width:0; display:grid; gap:3px; } .place-card span { color:var(--muted); font-size:.74rem; }
-    .place-icon { width:42px; min-height:42px; border-radius:14px; display:grid; place-items:center; color:var(--accent) !important; background:rgba(200,255,90,.08); }
-    .place-card button.danger { color:var(--danger); }
-    @media (max-width:760px) { .places-layout { grid-template-columns:1fr; } .plan-section-head { align-items:flex-start; } .coordinate-grid { grid-template-columns:1fr; } .place-card { flex-wrap:wrap; } .place-card > div { flex-basis:calc(100% - 54px); } .place-card button { margin-left:51px; } .place-card button ~ button { margin-left:0; } }
-  `
+  styleUrl: './navigate-page.component.scss'
 })
 export class NavigatePageComponent implements OnInit {
   private readonly maps = inject(GoogleMapsService);

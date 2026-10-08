@@ -28,10 +28,11 @@ Use Manrope throughout, including form controls. Keep large titles short, use se
 - Reuse `.primary-action`, `.secondary-action`, `.filter-bar`, `.search-field`, `.metric-card`, `.ride-row`, and `.empty-card` before adding a new visual variant.
 - Primary actions use lime with dark text. Secondary actions use dark surfaces. Period/review filters retain their warm-white selected pill; navigation and section tabs use lime. These distinguish filtering from changing destinations.
 - Layout tokens match the mobile system: `--radius-card: 24px`, `--radius-control: 18px`, `--radius-compact: 14px`, and `--touch-target: 44px`. Keep existing larger hero cards and pill buttons where their role warrants it.
-- Use the established spacing rhythm: 8–12px inside control groups, 16–20px between cards or for compact padding, and 24–28px between sections. Keep content aligned to its page grid.
+- Use shared responsive spacing tokens: `--page-gutter` (16–32px), `--card-padding` (16–24px), `--grid-gap` (12px on phones, 16px otherwise), and `--section-gap` (24–32px). Header, content, and bottom navigation use the same page gutter. Use 8–12px inside control groups. Avoid adding breakpoint-specific padding values when a shared token already covers the layout.
 - Preserve subtle surface shading, thin borders, and soft elevation. Keep cinematic artwork in heroes and route previews; ordinary forms should stay quiet and legible.
 - Desktop uses the sidebar; up to 1040px uses the five-item rounded bottom navigation. It occupies its own layout row, so it does not cover content. Retain safe-area spacing and keep the same destination names: Home, Plan, Journal, Insights, Account.
-- Below 680px, stack complex layouts and make filters easy to tap. Compact metrics may remain two columns; below 380px they stack. Wrap long user content without pushing controls off screen.
+- Below 680px, stack complex layouts and make filters easy to tap. Compact metrics use two columns, including narrow phones, with smaller values and shared padding. Account and saved-place grids choose their column count from the available content width instead of fixed column minimums that exceed the viewport. Wrap long user content without pushing controls off screen.
+- Align labels and values from the top in metric rows. Keep related controls the same height, align filters with sort inputs, and keep dialog titles beside their close buttons. Dialogs must scroll within short viewports. Avoid fixed card minimum heights that introduce large empty areas.
 
 ## Interaction and content
 

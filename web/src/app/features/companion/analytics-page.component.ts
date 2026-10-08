@@ -323,7 +323,6 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
   styles: `
     :host {
       display: block;
-      padding-bottom: 28px;
     }
 
     .pulse-hero,
@@ -337,14 +336,13 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
 
     .pulse-hero {
       position: relative;
-      min-height: 390px;
-      padding: clamp(24px, 4vw, 42px);
-      border-radius: 34px;
+      padding: var(--card-padding);
+      border-radius: var(--radius-card);
       overflow: hidden;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(180px, 0.38fr);
+      grid-template-columns: minmax(0, 1fr) minmax(140px, 0.32fr);
       align-items: center;
-      gap: clamp(24px, 5vw, 64px);
+      gap: var(--section-gap);
       background:
         radial-gradient(circle at 84% 30%, rgba(200, 255, 90, 0.18), transparent 28%),
         linear-gradient(135deg, rgba(31, 37, 45, 0.98), rgba(12, 15, 18, 0.96));
@@ -369,9 +367,10 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
 
     .pulse-heading-row {
       display: flex;
+      flex-wrap: wrap;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 18px;
+      gap: 12px;
     }
 
     .pulse-heading-row h3,
@@ -379,8 +378,8 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
     .section-heading h3,
     .care-strip h3 {
       margin: 0;
-      font-size: clamp(1.7rem, 4vw, 3rem);
-      line-height: 1.05;
+      font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.25rem);
+      line-height: 1.2;
     }
 
     .pace-pill {
@@ -404,7 +403,7 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
 
     .coaching-copy {
       max-width: 680px;
-      margin: 16px 0 30px;
+      margin: 16px 0 20px;
       color: var(--text-soft);
       line-height: 1.65;
     }
@@ -417,7 +416,7 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
     }
 
     .goal-progress-copy strong {
-      font-size: clamp(1.8rem, 4vw, 3.4rem);
+      font-size: clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem);
       line-height: 1;
     }
 
@@ -575,8 +574,8 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
     }
 
     .pulse-state {
-      padding: clamp(22px, 4vw, 34px);
-      border-radius: 28px;
+      padding: var(--card-padding);
+      border-radius: var(--radius-card);
     }
 
     .pulse-state p:not(.kicker) {
@@ -599,7 +598,7 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
 
     .insight-section,
     .trend-section {
-      margin-top: 34px;
+      margin-top: var(--section-gap);
     }
 
     .section-heading {
@@ -607,7 +606,7 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      gap: 22px;
+      gap: 16px;
     }
 
     .section-heading > p {
@@ -625,20 +624,20 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
     }
 
     .momentum-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
     }
 
     .character-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
     }
 
     .insight-card {
-      min-height: 170px;
-      padding: 20px;
-      border-radius: 24px;
+      min-height: 144px;
+      padding: var(--card-padding);
+      border-radius: var(--radius-card);
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      justify-content: flex-start;
       overflow: hidden;
     }
 
@@ -652,9 +651,9 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
 
     .insight-card dd {
       margin: 9px 0 7px;
-      font-size: clamp(1.45rem, 3vw, 2.35rem);
+      font-size: clamp(1.4rem, 1rem + 1vw, 2rem);
       font-weight: 900;
-      line-height: 1.05;
+      line-height: 1.2;
       overflow-wrap: anywhere;
     }
 
@@ -681,13 +680,13 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
     }
 
     .care-strip {
-      margin-top: 34px;
-      padding: clamp(22px, 4vw, 32px);
-      border-radius: 28px;
+      margin-top: var(--section-gap);
+      padding: var(--card-padding);
+      border-radius: var(--radius-card);
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      gap: 28px;
+      gap: var(--grid-gap);
     }
 
     .care-strip p:not(.kicker) {
@@ -724,8 +723,8 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
       font-weight: 900;
     }
 
-    .trend-section {
-      padding-top: 8px;
+    .section-heading h3 {
+      font-size: clamp(1.35rem, 1rem + 1vw, 1.85rem);
     }
 
     .trend-heading {
@@ -734,27 +733,17 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
 
     .chart-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+      gap: var(--grid-gap);
+      margin-top: var(--grid-gap);
     }
 
     .chart-grid .chart-card {
-      margin-top: 24px;
+      margin-top: 0;
     }
 
     .chart-grid .bars {
       height: 240px;
-    }
-
-    @media (max-width: 1100px) {
-      .momentum-grid,
-      .character-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .chart-grid {
-        grid-template-columns: 1fr;
-      }
     }
 
     @media (max-width: 760px) {
@@ -780,7 +769,6 @@ type Bucket = 'daily' | 'monthly' | 'yearly';
         text-align: left;
       }
 
-      .momentum-grid,
       .character-grid {
         grid-template-columns: 1fr;
       }
