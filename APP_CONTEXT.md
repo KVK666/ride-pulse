@@ -1,6 +1,6 @@
 # RidePulse App Context
 
-Last updated: 2026-09-07
+Last updated: 2026-10-08
 
 This file is the living context for the RidePulse app. Keep it updated whenever the app gains a meaningful feature, UX change, deployment change, setup change, or known limitation. Treat `APP_CONTEXT.md` as part of the definition of done for user-facing changes.
 
@@ -44,6 +44,7 @@ Do not commit `.env` files, API keys, database passwords, or Neon/AWS database c
 - Shows an App updates card in Profile so riders can manually check for, download, and restart into available OTA updates.
 - Supports two persisted cinematic themes shown as Midnight and True Black, while retaining the `graphite`/`oled` storage values and legacy `ktm`/`universal` migration.
 - UI uses the premium RidePulse journal system: near-black surfaces, warm white Manrope typography, restrained electric-lime accents, route artwork, softer elevation, and a floating bottom nav.
+- Web design rules are documented in `web/DESIGN.md`, grounded in the existing `web/src/styles.scss` and `mobile/src/theme/colors.ts`. Follow those rules for new features and reuse shared controls rather than introducing a separate visual style.
 - Shows an Android app icon based on `mobile/assets/ridepulse-logo.png`, aligned with the in-app lime/black RidePulse identity.
 - Uses Google Maps in navigation, ride, and history views.
 - Lets users search a destination and preview a route in Plan, then hand live guidance to Google Maps. Route preview uses a bounded foreground location fix instead of keeping a GPS watcher active.
@@ -94,6 +95,9 @@ Do not commit `.env` files, API keys, database passwords, or Neon/AWS database c
 - Timeline import adds native `expo-document-picker` and `expo-crypto` dependencies, so this release requires a newly built APK rather than an OTA-only update.
 - Adds an Angular web companion in `web/` using the same graphite/OLED and electric-lime identity. Its protected experience groups Home, Plan, Journal (Rides/Trips/Memories), Insights (Rider Pulse/Reports), Account, rich Ride Detail, profile editing, saved-place planning, and private synced albums behind a responsive sidebar/mobile shell with accessible focus and loading states.
 - Web ride recording is intentionally out of scope; the website directs riders to the Android app for GPS/background tracking, ride recovery, auto tracking, and OTA update workflows. Web foreground geolocation is used only for route planning.
+- Web responsive UI: phones/tablets use a persistent five-destination bottom navigation with safe-area spacing; desktop retains its scrollable sidebar. Related detail/legacy routes keep their parent destination highlighted. Mobile removes the duplicate top toolbar, while Account and Home retain the Android download links. Journal has compact search with an inline clear action, an empty-filter reset, stable rows while loading more, and visible/retryable trip load and creation errors.
+- Web Reports supports choosing a date for day/month/year summaries and returning to today. It sends the existing API's date-only anchor (`YYYY-MM-DD`); stale requests cannot overwrite a newer selection. Report period boundaries retain the backend's existing behavior. Print/export includes the selected period label.
+- October 2026 web verification: production build and 33 Angular unit tests passed locally; responsive browser checks used synthetic account/API data, not production rider data. Live backend, real devices, and deployment still require verification.
 - Password reset uses the Java API plus SMTP environment variables.
 
 ## Automatic Ride Tracking

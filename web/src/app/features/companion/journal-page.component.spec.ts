@@ -74,4 +74,28 @@ describe('JournalPageComponent', () => {
 
     expect(labels).toEqual(['Rides', 'Trips', 'Memories']);
   });
+
+  it('handles failed trip loads and allows retry', async () => {
+    const request = vi.spyOn(TestBed.inject(ApiService), 'request');
+    request.mockRejectedValueOnce(new Error('Trips are offline'));
+    const component = TestBed.createComponent(JournalPageComponent).componentInstance;
+    await component.loadTrips();
+    expect(component.tripError()).toBe('Trips are offline');
+    expect(component.tripLoading()).toBe(false);
+    request.mockResolvedValueOnce({ trips: [] });
+    await component.loadTrips();
+    expect(component.tripError()).toBe('');
+  });
+
+  it('keeps creation errors in the open trip dialog', async () => {
+    vi.spyOn(TestBed.inject(ApiService), 'request').mockRejectedValueOnce(new Error('Unable to save trip'));
+    const component = TestBed.createComponent(JournalPageComponent).componentInstance;
+    component.tripDialogOpen.set(true);
+    component.tripTitle = 'Weekend';
+    await component.createTrip(new Event('submit'));
+    expect(component.tripDialogOpen()).toBe(true);
+    expect(component.tripTitle).toBe('Weekend');
+    expect(component.tripSaveError()).toBe('Unable to save trip');
+    expect(component.tripSaving()).toBe(false);
+  });
 });

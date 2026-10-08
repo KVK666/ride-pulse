@@ -1,6 +1,6 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../core/auth.service';
 import { ProfilePhotoService } from '../../core/profile-photo.service';
@@ -8,33 +8,22 @@ import { ProfilePhotoService } from '../../core/profile-photo.service';
 @Component({
   selector: 'app-companion-shell',
   standalone: true,
-  imports: [LucideAngularModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [LucideAngularModule, RouterLink, RouterOutlet],
   template: `
-    <div class="app-shell" [class.menu-open]="mobileMenuOpen()">
-      <a class="skip-link" href="#companion-content">Skip to page content</a>
+    <div class="app-shell">
+      <a class="skip-link" href="#companion-content" (click)="skipToContent($event)">Skip to page content</a>
       <header class="mobile-shell-bar">
-        <a class="shell-brand" routerLink="/app/home" (click)="closeMobileMenu()">
+        <a class="shell-brand" routerLink="/app/home">
           <img src="/ridepulse-logo.png" alt="" />
           <span>RidePulse</span>
         </a>
-        <button
-          type="button"
-          class="mobile-menu-toggle"
-          aria-controls="companion-menu"
-          [attr.aria-expanded]="mobileMenuOpen()"
-          [attr.aria-label]="mobileMenuOpen() ? 'Close companion menu' : 'Open companion menu'"
-          (click)="toggleMobileMenu()"
-        >
-          <lucide-icon [name]="mobileMenuOpen() ? 'x' : 'menu'" size="22" />
+        <button type="button" class="logout" (click)="logout()" aria-label="Log out of RidePulse">
+          <lucide-icon name="log-out" size="18" /> Log out
         </button>
       </header>
 
-      @if (mobileMenuOpen()) {
-        <button type="button" class="menu-backdrop" aria-label="Close companion menu" (click)="closeMobileMenu()"></button>
-      }
-
       <aside class="sidebar" id="companion-menu">
-        <a class="shell-brand" routerLink="/app/home" (click)="closeMobileMenu()">
+        <a class="shell-brand" routerLink="/app/home">
           <img src="/ridepulse-logo.png" alt="" />
           <span>RidePulse</span>
         </a>
@@ -43,7 +32,7 @@ import { ProfilePhotoService } from '../../core/profile-photo.service';
             <section class="nav-group">
               <p>{{ group.label }}</p>
               @for (item of group.items; track item.path) {
-                <a [routerLink]="item.path" routerLinkActive="active" (click)="closeMobileMenu()">
+                <a [routerLink]="item.path" [class.active]="activeSection() === item.path" [attr.aria-current]="activeSection() === item.path ? 'page' : null">
                   <lucide-icon [name]="item.icon" size="18" />
                   <span class="nav-label">{{ item.label }}</span>
                 </a>
@@ -51,7 +40,7 @@ import { ProfilePhotoService } from '../../core/profile-photo.service';
             </section>
           }
         </nav>
-        <a class="sidebar-user" routerLink="/app/profile" (click)="closeMobileMenu()">
+        <a class="sidebar-user" routerLink="/app/profile">
           <span class="shell-avatar">
             @if (photo.photoUrl()) {
               <img [src]="photo.photoUrl()" alt="" />
@@ -70,7 +59,7 @@ import { ProfilePhotoService } from '../../core/profile-photo.service';
         </button>
       </aside>
 
-      <main class="app-main" id="companion-content" tabindex="-1">
+      <main #content class="app-main" id="companion-content" tabindex="-1">
         <header class="app-topbar">
           <div>
             <p>{{ pageEyebrow() }}</p>
@@ -91,6 +80,14 @@ import { ProfilePhotoService } from '../../core/profile-photo.service';
         </header>
         <router-outlet />
       </main>
+      <nav class="mobile-bottom-nav" aria-label="Companion">
+        @for (item of mobileNav; track item.path) {
+          <a [routerLink]="item.path" [class.active]="activeSection() === item.path" [attr.aria-current]="activeSection() === item.path ? 'page' : null">
+            <lucide-icon [name]="item.icon" size="21" />
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
     </div>
   `
 })
@@ -99,19 +96,22 @@ export class CompanionShellComponent implements OnInit {
   readonly photo = inject(ProfilePhotoService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  readonly mobileMenuOpen = signal(false);
+  @ViewChild('content') private content?: ElementRef<HTMLElement>;
+  readonly activeSection = signal('/app/home');
   readonly pageEyebrow = signal('YOUR RIDEPULSE');
+  private currentPath = '';
   readonly nav = [
     { label: 'RIDE', items: [
-      { path: '/app/home', label: 'Home', icon: 'house' },
-      { path: '/app/plan', label: 'Plan', icon: 'navigation' },
-      { path: '/app/journal', label: 'Journal', icon: 'history' },
+      { path: '/app/home', label: 'Home', icon: 'house', eyebrow: 'YOUR RIDEPULSE', aliases: [] },
+      { path: '/app/plan', label: 'Plan', icon: 'navigation', eyebrow: 'PLAN YOUR RIDE', aliases: ['/app/navigate', '/app/places'] },
+      { path: '/app/journal', label: 'Journal', icon: 'history', eyebrow: 'YOUR RIDE LIBRARY', aliases: ['/app/trips'] },
     ] },
     { label: 'REFLECT', items: [
-      { path: '/app/analytics', label: 'Insights', icon: 'chart-column-increasing' },
-      { path: '/app/profile', label: 'Account', icon: 'user' },
+      { path: '/app/analytics', label: 'Insights', icon: 'chart-column-increasing', eyebrow: 'RIDER PULSE', aliases: ['/app/reports'] },
+      { path: '/app/profile', label: 'Account', icon: 'user', eyebrow: 'YOUR RIDEPULSE', aliases: ['/app/you'] },
     ] }
   ];
+  readonly mobileNav = this.nav.flatMap((group) => group.items);
 
   get initials() {
     return (this.auth.user()?.name || 'Rider')
@@ -126,39 +126,33 @@ export class CompanionShellComponent implements OnInit {
     void this.photo.load();
     this.router.events.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.closeMobileMenu();
+        // The companion scrolls inside main, so window scroll restoration cannot reset it.
+        const path = event.urlAfterRedirects.split(/[?#]/)[0];
+        if (path !== this.currentPath) {
+          this.content?.nativeElement.scrollTo({ top: 0, behavior: 'instant' });
+        }
         this.updatePageHeader(event.urlAfterRedirects);
       }
     });
     this.updatePageHeader(this.router.url);
   }
 
-  toggleMobileMenu() {
-    this.mobileMenuOpen.update((open) => !open);
-  }
-
-  closeMobileMenu() {
-    this.mobileMenuOpen.set(false);
+  skipToContent(event: Event) {
+    event.preventDefault();
+    this.content?.nativeElement.focus();
   }
 
   private updatePageHeader(url: string) {
-    const [path] = url.split('?');
-    const match = [
-      ['/app/plan', 'PLAN YOUR RIDE', 'Plan'],
-      ['/app/navigate', 'PLAN YOUR RIDE', 'Plan'],
-      ['/app/places', 'PLAN YOUR RIDE', 'Plan'],
-      ['/app/journal', 'YOUR RIDE LIBRARY', 'Journal'],
-      ['/app/trips', 'YOUR RIDE LIBRARY', 'Journal'],
-      ['/app/analytics', 'RIDER PULSE', 'Insights'],
-      ['/app/reports', 'RIDER PULSE', 'Insights'],
-      ['/app/profile', 'YOUR RIDEPULSE', 'Account'],
-      ['/app/you', 'YOUR RIDEPULSE', 'Account'],
-    ].find(([prefix]) => path.startsWith(prefix));
-    this.pageEyebrow.set(match?.[1] || 'YOUR RIDEPULSE');
+    const [path] = url.split(/[?#]/);
+    this.currentPath = path;
+    const section = this.mobileNav.find((item) =>
+      [item.path, ...item.aliases].some((prefix) => path === prefix || path.startsWith(`${prefix}/`)),
+    );
+    this.pageEyebrow.set(section?.eyebrow || 'YOUR RIDEPULSE');
+    this.activeSection.set(section?.path || '/app/home');
   }
 
   async logout() {
-    this.closeMobileMenu();
     this.auth.logout();
     this.photo.clear();
     await this.router.navigate(['/']);

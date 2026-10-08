@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service';
 import { dateLabel, duration, km, kmh } from '../../core/format';
@@ -10,7 +11,7 @@ type Period = 'day' | 'month' | 'year';
 @Component({
   selector: 'app-reports-page',
   standalone: true,
-  imports: [LoadingPulseComponent, RouterLink],
+  imports: [FormsModule, LoadingPulseComponent, RouterLink],
   template: `
     <section class="page-title">
       <p class="kicker">RIDER PULSE</p>
@@ -24,11 +25,18 @@ type Period = 'day' | 'month' | 'year';
       <a class="active" routerLink="/app/reports" aria-current="page">Reports</a>
     </nav>
 
-    <div class="filter-bar">
-      @for (item of periods; track item) {
-        <button type="button" [class.active]="period() === item" (click)="setPeriod(item)">{{ item }}</button>
-      }
+    <div class="report-controls">
+      <div class="filter-bar" aria-label="Report period">
+        @for (item of periods; track item) {
+          <button type="button" [class.active]="period() === item" [attr.aria-pressed]="period() === item" (click)="setPeriod(item)">{{ item }}</button>
+        }
+      </div>
+      <label class="report-date">Date in period
+        <input type="date" [ngModel]="selectedDate()" (ngModelChange)="setDate($event)" [max]="today" required />
+      </label>
+      @if (selectedDate() !== today) { <button type="button" class="secondary-action" (click)="setDate(today)">Back to today</button> }
     </div>
+    <p class="report-period" aria-live="polite">{{ periodLabel() }}</p>
 
     @if (loading()) {
       <app-loading-pulse label="Loading ride report" />
@@ -57,13 +65,16 @@ type Period = 'day' | 'month' | 'year';
         </div>
       </section>
     } @else {
-      <article class="empty-card">{{ error() || 'Report unavailable.' }}</article>
+      <article class="empty-card"><p>{{ error() || 'Report unavailable.' }}</p><button class="secondary-action" type="button" (click)="load()">Try again</button></article>
     }
   `
 })
 export class ReportsPageComponent implements OnInit {
   private readonly api = inject(ApiService);
   readonly period = signal<Period>('month');
+  readonly today = this.localDate(new Date());
+  readonly selectedDate = signal(this.today);
+  private requestGeneration = 0;
   readonly report = signal<ReportResponse | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -78,20 +89,46 @@ export class ReportsPageComponent implements OnInit {
   }
 
   setPeriod(period: Period) {
+    if (this.period() === period) return;
     this.period.set(period);
     void this.load();
   }
 
+  setDate(value: string) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '') || value > this.today) return;
+    const date = new Date(`${value}T12:00:00`);
+    if (!Number.isFinite(date.getTime()) || this.localDate(date) !== value || value === this.selectedDate()) return;
+    this.selectedDate.set(value);
+    void this.load();
+  }
+
+  periodLabel() {
+    const date = new Date(`${this.selectedDate()}T12:00:00`);
+    const options: Intl.DateTimeFormatOptions = this.period() === 'year'
+      ? { year: 'numeric' }
+      : this.period() === 'month' ? { month: 'long', year: 'numeric' }
+      : { day: 'numeric', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+
+  private localDate(date: Date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  }
+
   async load() {
+    const generation = ++this.requestGeneration;
     this.loading.set(true);
     this.error.set('');
     try {
-      this.report.set(await this.api.request<ReportResponse>(`/reports?period=${this.period()}&date=${new Date().toISOString()}`));
+      const report = await this.api.request<ReportResponse>(`/reports?period=${this.period()}&date=${this.selectedDate()}`);
+      if (generation !== this.requestGeneration) return;
+      this.report.set(report);
     } catch (error: unknown) {
+      if (generation !== this.requestGeneration) return;
       this.error.set(error instanceof Error ? error.message : 'Unable to load report.');
       this.report.set(null);
     } finally {
-      this.loading.set(false);
+      if (generation === this.requestGeneration) this.loading.set(false);
     }
   }
 
@@ -120,6 +157,7 @@ export class ReportsPageComponent implements OnInit {
         </head>
         <body>
           <h1>RidePulse ${this.escape(report.period)} report</h1>
+          <p>${this.escape(this.periodLabel())}</p>
           <div class="summary">
             <div>Ride count: ${report.summary.rideCount}</div>
             <div>Distance: ${this.escape(km(report.summary.distanceM))}</div>

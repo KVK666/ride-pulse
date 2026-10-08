@@ -2,6 +2,8 @@
 
 Angular standalone web companion for RidePulse. It provides the public site, login/register, dashboard, journal, ride details, analytics, reports, profile, and foreground Google route preview.
 
+Follow [the RidePulse design language](DESIGN.md) for UI changes. Reuse the palette and shared components in `src/styles.scss` and preserve the matching Android identity.
+
 ## Development server
 
 Start a local development server:

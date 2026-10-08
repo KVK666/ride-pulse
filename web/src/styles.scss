@@ -21,6 +21,11 @@
   --success: #55d6a5;
   --blue: #67a7ff;
   --yellow: #ffc857;
+  --accent-tint: rgba(200, 255, 90, 0.09);
+  --radius-card: 24px;
+  --radius-control: 18px;
+  --radius-compact: 14px;
+  --touch-target: 44px;
   color-scheme: dark;
   font-family:
     'Manrope',
@@ -53,7 +58,9 @@ body {
 }
 
 button,
-input {
+input,
+textarea,
+select {
   font-family: inherit;
 }
 
@@ -120,14 +127,14 @@ select {
 }
 
 .mobile-shell-bar,
-.mobile-menu-toggle,
-.menu-backdrop {
+.mobile-bottom-nav {
   display: none;
 }
 
 .sidebar {
   height: 100dvh;
   min-height: 0;
+  overflow-y: auto;
   padding: 24px 16px;
   border-right: 1px solid rgba(245, 242, 234, 0.08);
   background: rgba(8, 10, 12, 0.82);
@@ -221,6 +228,11 @@ select {
   background: rgba(24, 28, 34, 0.58);
 }
 
+.sidebar-user > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .sidebar-user strong,
 .sidebar-user small {
   display: block;
@@ -256,19 +268,6 @@ select {
 .top-avatar {
   color: var(--on-accent);
   text-decoration: none;
-}
-
-.mobile-menu-toggle {
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(245, 242, 234, 0.12);
-  border-radius: 16px;
-  align-items: center;
-  justify-content: center;
-  place-items: center;
-  color: var(--text);
-  background: var(--surface-high);
-  cursor: pointer;
 }
 
 .app-main {
@@ -336,6 +335,40 @@ select {
   color: var(--on-accent);
   background: var(--accent);
   white-space: nowrap;
+}
+
+.report-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.report-controls .filter-bar { margin: 0; }
+
+.report-date {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+.report-date input {
+  min-height: var(--touch-target);
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-compact);
+  padding: 8px 12px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.report-period {
+  margin: 0 0 20px;
+  color: var(--text-soft);
 }
 
 .page-title {
@@ -424,6 +457,12 @@ select {
 
 .home-latest-card {
   min-height: 410px;
+}
+
+.home-latest-card h2 {
+  font-size: clamp(1.95rem, 3.4vw, 3.3rem);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
 }
 
 .home-latest-card .route-preview {
@@ -561,6 +600,11 @@ select {
   min-width: 0;
 }
 
+.ride-row > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .ride-row strong,
 .ride-row span {
   display: block;
@@ -611,7 +655,8 @@ select {
 
 .journal-tabs button.active { color: var(--on-accent); background: var(--accent); }
 
-.journal-controls { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.journal-controls .filter-bar { margin-bottom: 0; }
+.journal-controls { margin-bottom: 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .journal-sort { display: grid; gap: 6px; color: var(--muted); font-size: .72rem; font-weight: 900; text-transform: uppercase; }
 .journal-sort select { min-height: 44px; border: 1px solid var(--border); border-radius: 12px; padding: 0 10px; color: var(--text); background: var(--surface); font: inherit; text-transform: none; }
 .section-copy { margin: 6px 0 0; color: var(--muted); line-height: 1.5; }
@@ -691,7 +736,7 @@ select {
 .secondary-action,
 .icon-danger,
 .delete-ride-button {
-  min-height: 44px;
+  min-height: var(--touch-target);
   border: 0;
   border-radius: 999px;
   display: inline-flex;
@@ -810,7 +855,6 @@ select {
   color: var(--text);
   background: rgba(8, 10, 12, 0.62);
   font: inherit;
-  outline: none;
 }
 
 .review-panel textarea {
@@ -830,7 +874,6 @@ select {
   margin: 0;
 }
 
-.journal-search-panel,
 .trip-create-panel,
 .trip-detail-page .search-panel {
   grid-template-columns: minmax(0, 1fr);
@@ -847,6 +890,29 @@ select {
   gap: 10px;
   color: var(--muted);
   background: rgba(8, 10, 12, 0.62);
+}
+
+.search-panel .search-field:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.journal-search-panel.search-panel {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  margin-bottom: 16px;
+}
+
+.search-clear {
+  flex: 0 0 auto;
+  min-width: var(--touch-target);
+  min-height: var(--touch-target);
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
 }
 
 .search-panel .search-field input {
@@ -1055,6 +1121,8 @@ select {
   overflow: hidden;
   min-width: 0;
 }
+
+.journal-tile { color: var(--text); text-decoration: none; overflow-wrap: anywhere; }
 
 .journal-tile > a {
   color: inherit;
@@ -1343,7 +1411,7 @@ select {
 @media (max-width: 1040px) {
   .app-shell {
     grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
   }
 
   .mobile-shell-bar {
@@ -1365,56 +1433,38 @@ select {
     padding: 0;
   }
 
-  .mobile-menu-toggle {
+  .sidebar { display: none; }
+
+  .app-topbar { display: none; }
+
+  .mobile-bottom-nav {
     display: grid;
-    flex: 0 0 auto;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+    margin: 8px max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--surface);
   }
 
-  .menu-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 35;
-    display: block;
-    border: 0;
-    padding: 0;
-    background: rgba(0, 0, 0, 0.58);
-    cursor: pointer;
-  }
-
-  .sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 50;
-    width: min(86vw, 340px);
-    height: 100dvh;
-    min-height: 0;
-    padding: 22px 16px;
-    border-right: 1px solid rgba(245, 242, 234, 0.08);
-    border-bottom: 0;
+  .mobile-bottom-nav a {
+    min-height: 54px;
+    display: flex;
     flex-direction: column;
-    align-items: stretch;
-    overflow-y: auto;
-    transform: translateX(-105%);
-    transition: transform 180ms ease;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    border-radius: var(--radius-control);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 800;
   }
 
-  .app-shell.menu-open .sidebar {
-    transform: translateX(0);
-  }
-
-  .sidebar nav {
-    grid-auto-flow: row;
-    grid-auto-columns: auto;
-    overflow: visible;
-  }
-
-  .logout {
-    margin-left: 0;
-    margin-top: 0;
-  }
-
-  .sidebar-user {
-    display: inline-flex;
+  .mobile-bottom-nav a.active {
+    color: var(--accent);
+    background: var(--accent-tint);
   }
 
   .app-main {
@@ -1446,53 +1496,10 @@ select {
     padding: 16px clamp(16px, 4.4vw, 22px) max(34px, env(safe-area-inset-bottom));
   }
 
-  .app-topbar {
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 14px;
-    min-height: auto;
-    margin-bottom: 18px;
-    padding: 2px 0 12px;
-  }
+  input:not([type='checkbox']):not([type='range']),
+  textarea,
+  select { font-size: 1rem; }
 
-  .app-actions {
-    width: auto;
-    flex: 0 0 auto;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-
-  .download-pill {
-    font-size: 0;
-    width: 52px;
-    height: 52px;
-    min-height: 52px;
-    padding: 0;
-    justify-content: center;
-    border-radius: 999px;
-  }
-
-  .top-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 18px;
-  }
-
-  .app-topbar h1 {
-    font-size: clamp(1.55rem, 7vw, 2rem);
-    line-height: 1.05;
-  }
-
-  .mobile-shell-bar .shell-brand span {
-    display: none;
-  }
-
-  .sidebar nav a {
-    font-size: 0.95rem;
-    padding: 0 12px;
-  }
-
-  .metric-grid,
   .metric-grid.mini,
   .journal-grid,
   .card-row,
@@ -1581,9 +1588,10 @@ select {
   }
 
   .journal-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
-  .journal-tabs button { justify-content: center; padding: 0 8px; font-size: .8rem; }
+  .journal-tabs button { justify-content: center; gap: 5px; padding: 0 5px; font-size: .78rem; }
   .journal-controls { display: grid; grid-template-columns: 1fr; }
-  .journal-sort { width: 100%; }
+  .journal-controls .filter-bar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .journal-sort { grid-template-columns: auto minmax(0, 1fr); align-items: center; }
   .journal-row { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; align-items: center; }
   .journal-row-art { width: 52px; height: 52px; }
   .journal-row-metrics { grid-column: 2; min-width: 0; display: flex; justify-content: space-between; text-align: left; }
@@ -1652,6 +1660,8 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .metric-grid { grid-template-columns: 1fr; }
+
   .primary-action,
   .secondary-action,
   .delete-ride-button {
@@ -1660,6 +1670,11 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
   html {
     scroll-behavior: auto;
   }
